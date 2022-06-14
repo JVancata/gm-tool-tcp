@@ -1,5 +1,5 @@
 const { Packet } = require("./packet");
-const { LOGIN_REQUEST, TELEPORT_REQUEST, KICK_REQUEST, TPTOUSER_REQUEST, CHATBAN_REQUEST, MESSAGE_REQUEST } = require('./packetTypes');
+const { LOGIN_REQUEST, TELEPORT_REQUEST, KICK_REQUEST, TPTOUSER_REQUEST, CHATBAN_REQUEST, MESSAGE_REQUEST, ANNOUNCE_REQUEST, MONSTER_FIND_REQUEST, MONSTER_SPAWN_REQUEST } = require('./packetTypes');
 
 class Handler {
     static creator(packetId) {
@@ -55,6 +55,41 @@ class Handler {
         packet.writeString(charNameTarget); // target name
         packet.writeWord(0x0001); // random
         packet.writeString(charName); // player name
+        return packet.build();
+    }
+
+    static createAnnouncementPacket(server, announcement) {
+        const packet = this.creator(ANNOUNCE_REQUEST);
+        packet.writeDWord(server); // server
+        packet.writeString(announcement); // announcement
+        return packet.build();
+    }
+
+    static createMonsterFindPacket(server, channel, mapId, spawnId) {
+        const packet = this.creator(MONSTER_FIND_REQUEST);
+
+        packet.writeByte(server);
+        packet.writeByte(channel);
+        packet.writeWord(mapId);
+        packet.writeWord(spawnId);
+
+        return packet.build();
+    }
+
+    static createMonsterActionPacket(server, channel, mapId, monId, action, triggerId, hostId, rhID, rhType, spawnId) {
+        const packet = this.creator(MONSTER_SPAWN_REQUEST);
+
+        packet.writeByte(server);
+        packet.writeByte(channel);
+        packet.writeWord(mapId);
+        packet.writeDWord(monId);
+        packet.writeByte(action);
+        packet.writeDWord(triggerId);
+        packet.writeDWord(hostId);
+        packet.writeDWord(rhID);
+        packet.writeByte(rhType);
+        packet.writeWord(spawnId);
+
         return packet.build();
     }
 }
